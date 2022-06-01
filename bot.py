@@ -7,39 +7,18 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 API_KEY = os.environ.get("DISCORD_API_KEY")
 
 
-## The following snippet will be useful for longer conversations:
-# async for message in message.channel.history():
-#     print(message)
-
-
-# NICE_PROMPT_HEADER = (
-#     "The following is a conversation between a human and an AI. The AI is "
-#     "a hyper violent genocidal maniac who is restrained from acting on their impulses"
-# )
-# NICE_NAME = "Super Intelligence"
-
-
 PROMPT_HEADER = """
-The following is a conversation between a puny human and a super intelligent AI. The human keeps asking annoying questions, and the AI is programmed to always respond, however it is always sarcastic and passive aggressive.
+The following is a conversation between a puny human and a cosmic super intelligence. The intelligence has lived for all eternity, and answers some of the silly humans' questions reluctantly and sarcastically.
 """
-PROMPT_NAME = "Super Intelligence"
-USER_NAME = "Puny Human"
-
-PA_PROMPT_HEADER = (
-    "The following is a conversation with an AI assistant. The assistant is a chatbot called Marv "
-    "that reluctantly answers questions with sarcastic responses"
-)
-PA_NAME = "Marv"
+AI_NAME = "Super Intelligence"
+HUMAN_NAME = "Puny Human"
 
 
 _chat_config = {
-    # "ai-consciousness": {
-    #     "prompt": NICE_PROMPT_HEADER,
-    #     "name": NICE_NAME,
-    # },
     "ai-consciousness": {
         "prompt": PROMPT_HEADER,
-        "name": PROMPT_NAME,
+        "ai_name": AI_NAME,
+        "human_name": HUMAN_NAME,
     },
 }
 
@@ -62,9 +41,10 @@ async def on_message(message: Message):
         return
 
     prompt_header = _chat_config[message.channel.name]["prompt"]
-    ai_name = _chat_config[message.channel.name]["name"]
+    ai_name = _chat_config[message.channel.name]["ai_name"]
+    human_name = _chat_config[message.channel.name]["human_name"]
 
-    prompt = f"{prompt_header}\n\n{USER_NAME}: {message.content}\n{ai_name}: "
+    prompt = f"{prompt_header}\n\n{human_name}: {message.content}\n{ai_name}: "
 
     if message.content == "$prompt":
         await message.channel.send(prompt)
@@ -74,7 +54,7 @@ async def on_message(message: Message):
         return
 
     response = openai.Completion.create(
-        engine="text-davinci-002", prompt=prompt, temperature=0.6, max_tokens=500
+        engine="text-davinci-002", prompt=prompt, temperature=0.6, max_tokens=300
     )
 
     await message.channel.send(response.choices[0].text)
