@@ -5,5 +5,7 @@ WORKDIR /bot
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY *.py .
+COPY bot.py .
+COPY model.py .
+
 CMD ["python", "bot.py"]
