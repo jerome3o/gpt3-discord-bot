@@ -2,7 +2,7 @@ import os
 import openai
 
 from discord import Message, Client
-from model import PromptConfig
+from gptbot.legacy.model import PromptConfig
 
 
 openai.api_key = os.getenv("OPENAI_API_KEY")

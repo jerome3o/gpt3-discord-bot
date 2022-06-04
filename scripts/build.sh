@@ -1,0 +1,1 @@
+sudo docker build . -t gpt3-discord-bot

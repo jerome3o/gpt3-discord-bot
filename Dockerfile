@@ -5,7 +5,6 @@ WORKDIR /bot
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY bot.py .
-COPY model.py .
+COPY gptbot/ .
 
-CMD ["python", "bot.py"]
+CMD ["python", "-m", "gptbot.legacy.bot"]
