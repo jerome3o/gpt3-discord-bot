@@ -31,5 +31,7 @@ async def on_message(message: discord.Message):
 
     context_id = get_context_id_from_message(message)
 
+    await message.channel.send(context_id)
+
 
 client.run(API_KEY)

@@ -1,5 +1,7 @@
 venv/
 
+scratch/
+
 .env*
 
 *.pyc

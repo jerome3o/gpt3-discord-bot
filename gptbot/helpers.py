@@ -7,7 +7,7 @@ def get_context_id_from_message(message: discord.Message):
     guild_name = message.guild.name
     guild_id = message.guild.id
 
-    return f"{channel_name}-{guild_name}-{guild_id}"
+    return f"{channel_name}_{guild_name}_{guild_id}"
 
     # TODO: get identifier for discord server
     # server_name = channel.
