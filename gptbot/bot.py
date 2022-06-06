@@ -4,12 +4,13 @@ import logging
 
 import discord
 
-from gptbot.helpers import dialog_list_to_string, get_context_id_from_message
+from gptbot.helpers import get_context_id_from_message
 from gptbot.db import (
     add_dialog,
+    get_latest_ai_name,
     get_latest_name_map,
 )
-from gptbot.prompt import construct_prompt
+from gptbot.gpt import construct_prompt, query_gpt3, resummarise_if_needed
 from gptbot.commands import COMMANDS
 from gptbot.model import AI_SENDER_ID, Dialog
 
@@ -41,6 +42,9 @@ async def on_message(message: discord.Message):
 
     # Handle commands
 
+    if message.content.startswith("$ "):
+        return
+
     if message.content.startswith("$"):
         tokens = message.content.split()
         if tokens[0] in COMMANDS:
@@ -63,10 +67,23 @@ async def on_message(message: discord.Message):
     )
 
     # Construct Prompt
+    new_summary = resummarise_if_needed(context_id)
+    if new_summary:
+        await message.channel.send(f"```Updated summary:\n\n{new_summary.summary}```")
+
     prompt = construct_prompt(context_id, add_ai_prompt=True)
-    if message.content == "$prompt":
-        await message.channel.send(prompt)
-        return
+    response = query_gpt3(prompt).strip("\n")
+
+    add_dialog(
+        Dialog(
+            sender_id=AI_SENDER_ID,
+            sender_name=get_latest_ai_name(context_id),
+            context_id=context_id,
+            content=response,
+        )
+    )
+
+    await message.channel.send(response)
 
 
 def main():

@@ -4,7 +4,7 @@ import json
 
 from gptbot.db import get_latest_name_map, get_latest_summary, set_name_map, add_summary
 from gptbot.model import AI_SENDER_ID, Summary
-from gptbot.prompt import construct_prompt
+from gptbot.gpt import construct_prompt
 
 
 MessageHandler = Callable[[str, discord.Message, List[str]], str]
@@ -42,7 +42,7 @@ def _name_handler(context_id: str, sender_id: str, tokens: List[str]):
     if len(tokens) == 1:
         name_map = get_latest_name_map(context_id=context_id, sender_id=sender_id)
         name = name_map.name if name_map else sender_id
-        return f"Current name for {sender_id}: {name}"
+        return f"`Current name for {sender_id} is: {name}`"
 
     new_name = " ".join(tokens[1:])
     name_map = set_name_map(
@@ -50,7 +50,7 @@ def _name_handler(context_id: str, sender_id: str, tokens: List[str]):
         sender_id=sender_id,
         new_name=new_name,
     )
-    return f"Set name of {sender_id} to: {new_name}"
+    return f"`Name of {sender_id} has been set to: {new_name}`"
 
 
 def summary_handler(context_id: str, message: discord.Message, tokens: List[str]):
@@ -68,7 +68,7 @@ def summary_handler(context_id: str, message: discord.Message, tokens: List[str]
             ),
         )
 
-    return f"Current summary: \n```{summary.json(indent=4)}```"
+    return f"Current summary:\n```{summary.json(indent=4)}```"
 
 
 def prompt_handler(context_id: str, message: discord.Message, tokens: List[str]):

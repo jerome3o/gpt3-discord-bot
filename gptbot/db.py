@@ -128,7 +128,7 @@ def add_dialog(dialog: Dialog):
 @_output_as(List[Dialog])
 def get_dialog_since(context_id: str, timestamp: float):
     col = get_collection(Dialog)
-    return list(col.find({"context_id": context_id, "timestamp": {"$gt": timestamp}}))
+    return list(col.find({"context_id": context_id, "timestamp": {"$gte": timestamp}}))
 
 
 @_output_as(NameMap)
