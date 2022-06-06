@@ -34,7 +34,9 @@ async def on_message(message: discord.Message):
     context_id = get_context_id_from_message(message)
     context = get_context_from_id(context_id=context_id)
 
-    tokens = message.content.split(" ")
+    a: str = "ge"
+
+    tokens = message.content.split()
     if tokens[0] in COMMANDS:
         await message.channel.send(COMMANDS[tokens[0]](context_id, message, tokens))
         return

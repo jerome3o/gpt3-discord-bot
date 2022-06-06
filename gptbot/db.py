@@ -8,7 +8,7 @@ from pydantic import BaseModel, parse_obj_as
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from gptbot.model import AiContext, NameMap
+from gptbot.model import AiContext, NameMap, Summary
 
 CON_STR = os.environ["MONGO_CONNECTION_STRING"]
 client = MongoClient(CON_STR)
@@ -88,4 +88,24 @@ def set_name_map(context_id: str, sender_id: str, new_name: str) -> NameMap:
             timestamp=time.time(),
         ).dict()
     )
+    return col.find_one({"_id": v.inserted_id})
+
+
+@_output_as(List[Summary])
+def get_summaries(context_id: str) -> List[Summary]:
+    col = get_collection(Summary)
+    return list(col.find({"context_id": context_id}))
+
+
+def get_latest_summary(context_id: str) -> Summary:
+    summaries = get_summaries(context_id=context_id)
+    if not summaries:
+        return None
+    return max(summaries, key=lambda s: s.timestamp)
+
+
+@_output_as(Summary)
+def set_summary(context_id: str, summary: Summary):
+    col = get_collection(Summary)
+    v = col.insert_one(summary.dict())
     return col.find_one({"_id": v.inserted_id})
