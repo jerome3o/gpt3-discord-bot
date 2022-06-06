@@ -1,6 +1,6 @@
-from curses.ascii import GS
 import time
 import os
+import logging
 from functools import wraps
 from bson.objectid import ObjectId
 from typing import List, Optional, Type, TypeVar, Callable, Union
@@ -8,7 +8,9 @@ from pydantic import BaseModel, parse_obj_as
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from gptbot.model import AiContext, NameMap, Summary
+from gptbot.model import AI_SENDER_ID, AiContext, NameMap, Summary, Dialog
+
+_logger = logging.getLogger(__name__)
 
 CON_STR = os.environ["MONGO_CONNECTION_STRING"]
 client = MongoClient(CON_STR)
@@ -24,6 +26,8 @@ def _output_as(model: Type):
         @wraps(f)
         def _wrapper(*args, **kwargs):
             output = _id_to_str(f(*args, **kwargs))
+            if output is None:
+                return output
             return parse_obj_as(model, output)
 
         return _wrapper
@@ -79,15 +83,16 @@ def get_latest_name_map(context_id: str, sender_id: str) -> Optional[NameMap]:
 
 @_output_as(NameMap)
 def set_name_map(context_id: str, sender_id: str, new_name: str) -> NameMap:
-    col = get_collection(NameMap)
-    v = col.insert_one(
-        NameMap(
-            context_id=context_id,
-            sender_id=sender_id,
-            name=new_name,
-            timestamp=time.time(),
-        ).dict()
+    # TODO(j.swannack): Should this be constructed in external to this function?
+    name_map = NameMap(
+        context_id=context_id,
+        sender_id=sender_id,
+        name=new_name,
+        timestamp=time.time(),
     )
+    _logger.info(f"Adding name map: {name_map}")
+    col = get_collection(NameMap)
+    v = col.insert_one(name_map.dict())
     return col.find_one({"_id": v.inserted_id})
 
 
@@ -106,6 +111,31 @@ def get_latest_summary(context_id: str) -> Summary:
 
 @_output_as(Summary)
 def add_summary(summary: Summary):
+    _logger.info(f"Adding summary: {summary}")
     col = get_collection(Summary)
     v = col.insert_one(summary.dict())
     return col.find_one({"_id": v.inserted_id})
+
+
+@_output_as(Dialog)
+def add_dialog(dialog: Dialog):
+    _logger.info(f"Adding dialog: {dialog}")
+    col = get_collection(Dialog)
+    v = col.insert_one(dialog.dict())
+    return col.find_one(v.inserted_id)
+
+
+@_output_as(List[Dialog])
+def get_dialog_since(context_id: str, timestamp: float):
+    col = get_collection(Dialog)
+    return list(col.find({"context_id": context_id, "timestamp": {"$gt": timestamp}}))
+
+
+@_output_as(NameMap)
+def get_latest_ai_name_map(context_id: str) -> NameMap:
+    return get_latest_name_map(context_id, sender_id=AI_SENDER_ID)
+
+
+def get_latest_ai_name(context_id: str) -> str:
+    name_map = get_latest_ai_name_map(context_id)
+    return name_map.name if name_map else AI_SENDER_ID

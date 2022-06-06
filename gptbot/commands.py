@@ -1,10 +1,10 @@
 from typing import Callable, List
 import discord
 import json
-import time
 
 from gptbot.db import get_latest_name_map, get_latest_summary, set_name_map, add_summary
 from gptbot.model import AI_SENDER_ID, Summary
+from gptbot.prompt import construct_prompt
 
 
 MessageHandler = Callable[[str, discord.Message, List[str]], str]
@@ -64,7 +64,6 @@ def summary_handler(context_id: str, message: discord.Message, tokens: List[str]
         summary = add_summary(
             summary=Summary(
                 **partial,
-                timestamp=time.time(),
                 context_id=context_id,
             ),
         )
@@ -72,8 +71,14 @@ def summary_handler(context_id: str, message: discord.Message, tokens: List[str]
     return f"Current summary: \n```{summary.json(indent=4)}```"
 
 
+def prompt_handler(context_id: str, message: discord.Message, tokens: List[str]):
+    prompt = construct_prompt(context_id)
+    return f"Current prompt:\n```\n{prompt}\n```"
+
+
 COMMANDS = {
     "$name": human_name_handler,
     "$ainame": ai_name_handler,
     "$summary": summary_handler,
+    "$prompt": prompt_handler,
 }

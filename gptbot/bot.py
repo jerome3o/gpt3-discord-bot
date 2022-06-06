@@ -1,11 +1,17 @@
 import os
 import openai
+import logging
 
 import discord
 
-from gptbot.helpers import get_context_id_from_message
-from gptbot.db import get_context_from_id
-from gptbot.commands import human_name_handler, COMMANDS
+from gptbot.helpers import dialog_list_to_string, get_context_id_from_message
+from gptbot.db import (
+    add_dialog,
+    get_latest_name_map,
+)
+from gptbot.prompt import construct_prompt
+from gptbot.commands import COMMANDS
+from gptbot.model import AI_SENDER_ID, Dialog
 
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -32,18 +38,43 @@ async def on_message(message: discord.Message):
         return
 
     context_id = get_context_id_from_message(message)
-    context = get_context_from_id(context_id=context_id)
 
-    a: str = "ge"
+    # Handle commands
 
-    tokens = message.content.split()
-    if tokens[0] in COMMANDS:
-        await message.channel.send(COMMANDS[tokens[0]](context_id, message, tokens))
+    if message.content.startswith("$"):
+        tokens = message.content.split()
+        if tokens[0] in COMMANDS:
+            await message.channel.send(COMMANDS[tokens[0]](context_id, message, tokens))
+            return
+        await message.channel.send(f"Unknown command")
         return
 
-    print(context)
+    # Handle dialog
 
-    await message.channel.send(context_id)
+    add_dialog(
+        Dialog(
+            sender_id=message.author.name,
+            sender_name=get_latest_name_map(
+                context_id=context_id, sender_id=message.author.name
+            ).name,
+            context_id=context_id,
+            content=message.content,
+        )
+    )
+
+    # Construct Prompt
+    prompt = construct_prompt(context_id, add_ai_prompt=True)
+    if message.content == "$prompt":
+        await message.channel.send(prompt)
+        return
 
 
-client.run(API_KEY)
+def main():
+    client.run(API_KEY)
+
+
+if __name__ == "__main__":
+    import logging
+
+    logging.basicConfig(level=logging.INFO)
+    main()

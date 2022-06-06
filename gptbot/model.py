@@ -1,3 +1,4 @@
+import time
 from typing import Dict
 from pydantic import BaseModel, Field
 
@@ -6,7 +7,7 @@ AI_SENDER_ID = "AI"
 
 
 class TimestampedItem(BaseModel):
-    timestamp: float
+    timestamp: float = Field(default_factory=time.time)
 
 
 class AiContext(BaseModel):
@@ -28,6 +29,7 @@ class Action(TimestampedItem):
 
 
 class Dialog(TimestampedItem):
+    context_id: str
     sender_id: str
     sender_name: str
     content: str

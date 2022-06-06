@@ -1,4 +1,7 @@
+from typing import List
+
 import discord
+from gptbot.model import Dialog
 
 
 def get_context_id_from_message(message: discord.Message):
@@ -11,3 +14,7 @@ def get_context_id_from_message(message: discord.Message):
 
     # TODO: get identifier for discord server
     # server_name = channel.
+
+
+def dialog_list_to_string(dialog: List[Dialog]) -> str:
+    return "\n".join([f"{d.sender_name}: {d.content}" for d in dialog])
