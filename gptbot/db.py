@@ -105,7 +105,7 @@ def get_latest_summary(context_id: str) -> Summary:
 
 
 @_output_as(Summary)
-def set_summary(context_id: str, summary: Summary):
+def add_summary(summary: Summary):
     col = get_collection(Summary)
     v = col.insert_one(summary.dict())
     return col.find_one({"_id": v.inserted_id})

@@ -3,7 +3,7 @@ import discord
 import json
 import time
 
-from gptbot.db import get_latest_name_map, get_latest_summary, set_name_map, set_summary
+from gptbot.db import get_latest_name_map, get_latest_summary, set_name_map, add_summary
 from gptbot.model import AI_SENDER_ID, Summary
 
 
@@ -61,8 +61,7 @@ def summary_handler(context_id: str, message: discord.Message, tokens: List[str]
     else:
         config = message.content.replace("$summary", "").replace("```", "")
         partial = json.loads(config)
-        summary = set_summary(
-            context_id=context_id,
+        summary = add_summary(
             summary=Summary(
                 **partial,
                 timestamp=time.time(),
