@@ -4,6 +4,8 @@ import openai
 import discord
 
 from gptbot.helpers import get_context_id_from_message
+from gptbot.db import get_context_from_id
+from gptbot.commands import human_name_handler
 
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -14,6 +16,8 @@ client = discord.Client()
 
 MESSAGE_BUFFER_SIZE = 5
 CLEAR = "$clear"
+
+COMMANDS = {"$name": human_name_handler}
 
 
 @client.event
@@ -30,6 +34,14 @@ async def on_message(message: discord.Message):
         return
 
     context_id = get_context_id_from_message(message)
+    context = get_context_from_id(context_id=context_id)
+
+    tokens = message.content.split(" ")
+    if tokens[0] in COMMANDS:
+        await message.channel.send(COMMANDS[tokens[0]](context_id, message, tokens))
+        return
+
+    print(context)
 
     await message.channel.send(context_id)
 

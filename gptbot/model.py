@@ -1,33 +1,36 @@
 from typing import Dict
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+
+
+class TimestampedItem(BaseModel):
+    timestamp: float
 
 
 class AiContext(BaseModel):
-    identifier: str
-    name: str
-    situation_synopsis: str
+    context_id: str
+    # TODO: not sure what else might have to live here?
 
 
-class Summary(BaseModel):
+class Summary(TimestampedItem):
     context_id: str
     summary: str
-    opinions: Dict[str, str]
+    opinions: Dict[str, str] = Field(default_factory=dict)
 
 
-class Command(BaseModel):
+class Command(TimestampedItem):
     context_id: str
     sender_id: str
     sender_name: str
     content: str
 
 
-class Message(BaseModel):
+class Message(TimestampedItem):
     sender_id: str
     sender_name: str
     content: str
 
 
-class NameMap(BaseModel):
+class NameMap(TimestampedItem):
     context_id: str
     sender_id: str
     name: str
