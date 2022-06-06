@@ -1,3 +1,5 @@
+from curses.ascii import GS
+import time
 import os
 from functools import wraps
 from bson.objectid import ObjectId
@@ -73,3 +75,17 @@ def get_latest_name_map(context_id: str, sender_id: str) -> Optional[NameMap]:
         name_maps,
         key=lambda m: m.timestamp,
     )
+
+
+@_output_as(NameMap)
+def set_name_map(context_id: str, sender_id: str, new_name: str) -> NameMap:
+    col = get_collection(NameMap)
+    v = col.insert_one(
+        NameMap(
+            context_id=context_id,
+            sender_id=sender_id,
+            name=new_name,
+            timestamp=time.time(),
+        ).dict()
+    )
+    return col.find_one({"_id": v.inserted_id})
