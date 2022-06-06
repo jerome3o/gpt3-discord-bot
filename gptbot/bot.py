@@ -5,7 +5,7 @@ import discord
 
 from gptbot.helpers import get_context_id_from_message
 from gptbot.db import get_context_from_id
-from gptbot.commands import human_name_handler
+from gptbot.commands import human_name_handler, COMMANDS
 
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -16,8 +16,6 @@ client = discord.Client()
 
 MESSAGE_BUFFER_SIZE = 5
 CLEAR = "$clear"
-
-COMMANDS = {"$name": human_name_handler}
 
 
 @client.event

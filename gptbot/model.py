@@ -2,6 +2,9 @@ from typing import Dict
 from pydantic import BaseModel, Field
 
 
+AI_SENDER_ID = "AI"
+
+
 class TimestampedItem(BaseModel):
     timestamp: float
 
@@ -17,14 +20,14 @@ class Summary(TimestampedItem):
     opinions: Dict[str, str] = Field(default_factory=dict)
 
 
-class Command(TimestampedItem):
+class Action(TimestampedItem):
     context_id: str
     sender_id: str
     sender_name: str
     content: str
 
 
-class Message(TimestampedItem):
+class Dialog(TimestampedItem):
     sender_id: str
     sender_name: str
     content: str
