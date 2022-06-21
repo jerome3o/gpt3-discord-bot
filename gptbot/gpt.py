@@ -32,6 +32,7 @@ def query_gpt3(prompt: str) -> str:
         temperature=TEMPERATURE,
         max_tokens=MAX_TOKENS,
         presence_penalty=2,
+        frequency_penalty=2,
     )
     return response.choices[0].text
 
