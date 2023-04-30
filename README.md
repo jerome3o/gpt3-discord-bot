@@ -30,5 +30,21 @@ You'll need a text channel starting with `ai-`
 The channel needs to have a description with a JSON value like:
 
 ```json
-TODO: write up
+{
+    "prompt": "The following is a conversation between a puny human and a cosmic super intelligence. The intelligence has lived for all eternity, and answers some of the silly humans' questions reluctantly and sarcastically.",
+    "ai_name": "Super intelligence",
+    "human_name": "Puny Human"
+}
 ```
+
+Get creative! the GPT-3 is much better than you'd think at playing along.
+
+## Usage
+
+Just talk into the `ai-X` channels that you make, and it should respond. It only has about 5 messages of memory, and you can clear it's memory by typing $clear into the chat.
+
+## Limitations
+
+* Only 5 messages of memory
+* It sees all chat members as the same person
+* It will respond to every single message
