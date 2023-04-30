@@ -28,6 +28,10 @@ pip install -r requirements.txt
 * Head over to the [OpenAI website](https://platform.openai.com/account/api-keys) for api token management
 * You may need to make an account and setup your card for payment
 
+## .env File
+
+Use your OpenAI and Discord api tokens to create a `.env` file in the root of this repo like:
+
 ```sh
 OPENAI_API_KEY=YOUR_OPENAI_API_KEY
 DISCORD_API_KEY=YOUR_DISCORD_API_KEY
